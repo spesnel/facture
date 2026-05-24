@@ -2,7 +2,6 @@ package fr.lpadmin.facture.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 
@@ -39,10 +38,10 @@ public class PdfService {
             byte[] imageBytes = baos.toByteArray();
 
                 // save image to file for debug
-                File output = pdfFile.toPath().resolveSibling(pdfFile.getName() + ".png").toFile();
-                try (FileOutputStream fos = new FileOutputStream(output)) {
-                    fos.write(imageBytes);
-                }
+                // File output = pdfFile.toPath().resolveSibling(pdfFile.getName() + ".png").toFile();
+                // try (FileOutputStream fos = new FileOutputStream(output)) {
+                //     fos.write(imageBytes);
+                // }
 
             return Base64.getEncoder()
                           .encodeToString(imageBytes);

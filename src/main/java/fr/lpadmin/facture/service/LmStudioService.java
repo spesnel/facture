@@ -26,14 +26,16 @@ public class LmStudioService {
 
     public LmStudioService(
         @Value("${app.lmstudio.baseurl}") String baseUrl,
-        @Value("${app.lmstudio.model}") String model
+        @Value("${app.lmstudio.model}") String model,
+        @Value("${app.lmstudio.connect-timeout-ms:5000}") int connectTimeoutMs,
+        @Value("${app.lmstudio.read-timeout-ms:180000}") int readTimeoutMs
     ) {
         LOGGER.info("Initializing LmStudioService with baseUrl: {} and model: {}", baseUrl, model);
         this.model = model;
 
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);
-        factory.setReadTimeout(60000);
+        factory.setConnectTimeout(connectTimeoutMs);
+        factory.setReadTimeout(readTimeoutMs);
 
         this.restClient = RestClient.builder()
         .requestFactory(factory)//new JdkClientHttpRequestFactory(httpClient))

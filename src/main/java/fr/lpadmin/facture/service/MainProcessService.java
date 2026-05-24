@@ -47,7 +47,7 @@ public class MainProcessService {
 
             LOGGER.info("Finished facture processing.");
         } catch (Exception e) {
-            LOGGER.error("Error processing facture {}: {}", facture.getName(), e.getMessage());
+            LOGGER.error("Error processing facture {}: {}", facture.getName(), e.getMessage(), e);
         }
     }
 

@@ -1,0 +1,27 @@
+Réponds aux questions suivantes. Retourne les réponses au format JSON.
+- Quel est le numéro de la facture ? 
+  - à retourner dans le champ "numeroFacture"
+- Quelle est la date d'émission de la facture ? 
+  - à retourner dans le champ "dateFacture" au format jj/mm/aaaa si possible
+  - se limiter au jour, en pas retourner l'heure
+- Quel est le montant total TTC ou net à payer ? 
+  - à retourner dans le champ "montantTotalTTC"
+  - c'est le montant total à payer, il correspond au montant HT + TVA, il peut être précédé de "montant à payer", "montant total", "total TTC" ou "total à payer" et suivi de "euros" ou du symbole "€"
+- Quelle est la référence de paiement ? 
+  - à retourner dans le champ "referencePaiement", c'est la référence à préciser lors du paiement, il est souvent entouré de +++, s'il n'est pas trouvé retournez une chaîne vide
+
+## FORMAT DE LA REPONSE
+The JSON format should be as follows:
+{
+    "numeroFacture": "string",
+    "dateFacture": "string",
+    "montantTotalTTC": "string",
+    "referencePaiement": "string"
+}
+
+## POINT D'ATTENTION
+Attention :
+    - Si vous ne pouvez pas trouver l'une des informations, mettez une chaîne vide pour sa valeur.
+    - Ne pas confondre un code postal d'adresse avec un numéro de facture, un montant ou une date, les codes postaux sont inclus dans les blocs adresse à ignorer.
+    - Ne pas renvoyer le montant HT mais le montant TTC, même si le montant HT est plus facilement identifiable, le montant TTC est celui qui correspond au montant à payer
+    - ne pas renvoyer la date d'échéance mais la date d'émission de la facture, la date d'échéance est la date à laquelle le paiement doit être effectué, elle ne

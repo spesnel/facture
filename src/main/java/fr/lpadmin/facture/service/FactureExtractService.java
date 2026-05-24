@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import fr.lpadmin.facture.constant.Prompt;
 import fr.lpadmin.facture.model.ExtExtractData;
 import fr.lpadmin.facture.model.ExtractData;
 import fr.lpadmin.facture.model.lmstudio.Answer;
@@ -24,28 +23,37 @@ public class FactureExtractService {
 
     private final LmStudioService lmStudioService;
     private final PdfService pdfService;
+    private final PromptService promptService;
 
     public FactureExtractService(LmStudioService lmStudioService,
-    PdfService pdfService
+    PdfService pdfService, PromptService promptService
     ) {
         this.lmStudioService = lmStudioService;
         this.pdfService = pdfService;
+        this.promptService = promptService;
     }
+
 
     public ExtExtractData processFacture(File facture) throws IOException {
         
-        String prompt = Prompt.PROMPT;
+        String prompt = promptService.getPrompt();
 
-            // String img = pdfService.toImage(facture);
-            //String msg = lmStudioService.chatOnImg(prompt, img).getOutput().get(0).getContent();
-            //String content = "Ce bloc contient le contenu texte du PDF sur lequel porte le prompt. il sera suivi par l'image\n\n" + 
+        String img = null;
+        if(promptService.isIncludeImg()){
+            img = pdfService.toImage(facture);
+        }
+        //String msg = lmStudioService.chatOnImg(prompt, img).getOutput().get(0).getContent();
+        //String content = "Ce bloc contient le contenu texte du PDF sur lequel porte le prompt. il sera suivi par l'image\n\n" + 
+
+        String msgQuery = prompt + "\n\n";
+        if(promptService.isIncludeText()){
             String content = pdfService.toString(facture);
             LOGGER.debug("Extracted content: {}", content);
-
-        String msgQuery = prompt + "\n\n" 
-        +"****** START INVOICE CONTENT ******\n\n"
-        +content
-        +"****** END INVOICE CONTENT ******\n\n";
+            msgQuery += "Le contenu du PDF est le suivant :\n\n" + content + "\n\n"
+            + "****** START INVOICE CONTENT ******\n\n"
+            + content
+            + "****** END INVOICE CONTENT ******\n\n";
+        }
 
             Answer answer;
             String msg;
@@ -64,6 +72,9 @@ public class FactureExtractService {
 
 Query query = new Query();
 query.addInput(new TextInput(msgQuery));
+if(promptService.isIncludeImg()){
+    query.addInput(new ImageInput(img, true));
+}
 query.setStore(false);
 answer = lmStudioService.chat(query);
             msg = answer.getOutput().get(0).getContent();
