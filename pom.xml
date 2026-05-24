@@ -31,6 +31,15 @@
         </dependency>
 
         <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>${poi.version}</version>
@@ -56,6 +65,12 @@
             <artifactId>spring-boot-restclient</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -63,6 +78,117 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+              <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-antrun-plugin</artifactId>
+                 <version>3.1.0</version>
+                 <executions>
+                    <execution>
+                        <id>download-ubl-xsd-set</id>
+                        <phase>initialize</phase>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                        <configuration>
+                           <target>
+                              <mkdir dir="${project.build.directory}/generated-resources/xsd/maindoc"/>
+                              <mkdir dir="${project.build.directory}/generated-resources/xsd/common"/>
+
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/maindoc/UBL-Invoice-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/maindoc/UBL-Invoice-2.0.xsd"
+                                  usetimestamp="true"/>
+
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/CCTS_CCT_SchemaModule-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/CCTS_CCT_SchemaModule-2.0.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/CodeList_CurrencyCode_ISO_7_04.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/CodeList_CurrencyCode_ISO_7_04.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/CodeList_LanguageCode_ISO_7_04.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/CodeList_LanguageCode_ISO_7_04.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/CodeList_MIMEMediaTypeCode_IANA_7_04.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/CodeList_MIMEMediaTypeCode_IANA_7_04.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/CodeList_UnitCode_UNECE_7_04.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/CodeList_UnitCode_UNECE_7_04.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/UBL-CommonAggregateComponents-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/UBL-CommonAggregateComponents-2.0.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/UBL-CommonBasicComponents-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/UBL-CommonBasicComponents-2.0.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/UBL-CommonExtensionComponents-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/UBL-CommonExtensionComponents-2.0.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/UBL-CoreComponentParameters-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/UBL-CoreComponentParameters-2.0.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/UBL-ExtensionContentDatatype-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/UBL-ExtensionContentDatatype-2.0.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/UBL-QualifiedDatatypes-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/UBL-QualifiedDatatypes-2.0.xsd"
+                                  usetimestamp="true"/>
+                              <get src="https://docs.oasis-open.org/ubl/cs-UBL-2.0/xsd/common/UnqualifiedDataTypeSchemaModule-2.0.xsd"
+                                  dest="${project.build.directory}/generated-resources/xsd/common/UnqualifiedDataTypeSchemaModule-2.0.xsd"
+                                  usetimestamp="true"/>
+                           </target>
+                        </configuration>
+                    </execution>
+                 </executions>
+              </plugin>
+
+            <plugin>
+                <groupId>org.jvnet.jaxb</groupId>
+                <artifactId>jaxb-maven-plugin</artifactId>
+                <version>4.0.8</version>
+                <executions>
+                    <execution>
+                        <id>generate-ubl-invoice-beans</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>${project.build.directory}/generated-resources/xsd/maindoc</schemaDirectory>
+                            <schemaIncludes>
+                                <include>UBL-Invoice-2.0.xsd</include>
+                            </schemaIncludes>
+                            <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-ubl-schemas-to-classpath</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/ubl/xsd</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-resources/xsd</directory>
+                                    <includes>
+                                        <include>**/*.xsd</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
                 
                 <plugin>

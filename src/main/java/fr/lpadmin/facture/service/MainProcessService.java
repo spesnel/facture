@@ -18,14 +18,16 @@ public class MainProcessService {
     
     private final FactureListService factureListService;
     private final FactureExtractService factureExtractService;
+    private final FactureXmlExtractService factureXmlExtractService;
     private final OutputService outputService;
 
     public MainProcessService(
         FactureListService factureListService, FactureExtractService factureExtractService,
-    OutputService outputService
+        FactureXmlExtractService factureXmlExtractService, OutputService outputService
     ) {
         this.factureListService = factureListService;
         this.factureExtractService = factureExtractService;
+        this.factureXmlExtractService = factureXmlExtractService;
 
         this.outputService = outputService;
     }
@@ -42,9 +44,17 @@ public class MainProcessService {
     public void processFacture(File facture, OutputData outputData) {
         try {
             LOGGER.info("Processing facture: {}", facture.getName());
-            ExtExtractData extExtractData = factureExtractService.processFacture(facture);
-            outputService.addLine(outputData, extExtractData);
 
+            // if file with xml extension exists in same directory then process XML
+            File xmlFile = new File(facture.getParentFile(), facture.getName().replace(".pdf", ".xml"));
+            if (xmlFile.exists()) {
+                LOGGER.info("found XML file {}", xmlFile);
+                ExtExtractData xmlExtractData = factureXmlExtractService.processFacture(xmlFile);
+                outputService.addLine(outputData, xmlExtractData);
+            } else {
+                ExtExtractData extExtractData = factureExtractService.processFacture(facture);
+                outputService.addLine(outputData, extExtractData);
+            }
             LOGGER.info("Finished facture processing.");
         } catch (Exception e) {
             LOGGER.error("Error processing facture {}: {}", facture.getName(), e.getMessage(), e);
